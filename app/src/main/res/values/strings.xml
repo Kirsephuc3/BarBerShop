@@ -52,6 +52,7 @@
     <string name="date_booking">Ngày cắt</string>
     <string name="rating">rating</string>
     <string name="coupon">coupon</string>
+    <string name="service"></string>
     <string name="voucher_code">Mã giảm giá</string>
     <string name="input_voucher_header">Nhập mã voucher(nếu có)</string>
     <string name="select_city_header">Chọn thành phố</string>

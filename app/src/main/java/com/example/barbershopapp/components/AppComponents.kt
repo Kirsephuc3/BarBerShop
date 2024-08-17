@@ -1,7 +1,8 @@
 package com.example.barbershopapp.components
 
 import android.util.Log
-import android.widget.RatingBar
+import androidx.annotation.StringRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,8 +18,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -40,6 +45,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
@@ -62,8 +68,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -79,6 +87,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.barbershopapp.R
+import com.example.barbershopapp.Screen.User.ActionButtons
+import com.example.barbershopapp.Screen.User.PageIndicator
 import com.example.barbershopapp.data.home.BottomNavItem
 import com.example.barbershopapp.data.stylist.Stylist
 import com.example.barbershopapp.navigation.BarBerShopAppRoute
@@ -599,17 +609,6 @@ fun AppToolbar(
     )
 }
 
-@Composable
-fun StylistItemComponent(stylist: Stylist) {
-    Card(modifier = Modifier.padding(8.dp)) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Tên: ${stylist.name}")
-            Text(text = "Email: ${stylist.email}")
-            Text(text = "Số điện thoại: ${stylist.phone}")
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DynamicSelectTextField(
@@ -619,7 +618,7 @@ fun DynamicSelectTextField(
     onValueChangedEvent: (String) -> Unit,
     defaultDisplayText: String = "Chọn thành phố",
     modifier: Modifier = Modifier
-    ) {
+) {
     var expanded by remember { mutableStateOf(false) }
     var displayText by remember { mutableStateOf(defaultDisplayText) }
 
@@ -653,6 +652,17 @@ fun DynamicSelectTextField(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun StylistItemComponent(stylist: Stylist) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Tên: ${stylist.name}")
+            Text(text = "Email: ${stylist.email}")
+            Text(text = "Số điện thoại: ${stylist.phone}")
         }
     }
 }
@@ -831,31 +841,96 @@ fun ratingbody() {
     }
 }
 
+//@Composable
+//fun discount() {
+//    Box(
+//        modifier = Modifier
+//            .height(140.dp)
+//            .fillMaxWidth()
+//            .padding(8.dp)
+//            .background(Color.White)
+//            .clip(RoundedCornerShape(12.dp))
+//            .clickable { BarBerShopAppRoute.navigateTo(Screen.HistoryScreen) }
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(end = 8.dp)
+//                .align(Alignment.TopStart),
+//            horizontalArrangement = Arrangement.Start,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Image(
+//                painter = painterResource(id = R.drawable.voucher2),
+//                contentDescription = "Custom Image",
+//                modifier = Modifier.fillMaxSize()
+//                    .padding(1.dp)
+//            )
+//        }
+//    }
+//}
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun discount() {
-    Box(
+fun HorizontalPagerSection(pagerItems: List<PagerItem>, pagerState: PagerState) {
+    HorizontalPager(
+        state = pagerState,
+        verticalAlignment = Alignment.Top,
         modifier = Modifier
-            .height(140.dp)
             .fillMaxWidth()
-            .padding(8.dp)
-            .background(Color.White)
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { BarBerShopAppRoute.navigateTo(Screen.HistoryScreen) }
-    ) {
-        Row(
+            .padding(10.dp)
+
+    ) { currentPage ->
+        val pagerItem = pagerItems[currentPage]
+
+        Image(
+            painter = painterResource(id = pagerItem.imageResId),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
+                .requiredSize(360.dp)
                 .fillMaxWidth()
-                .padding(end = 8.dp)
-                .align(Alignment.TopStart),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.voucher2),
-                contentDescription = "Custom Image",
-                modifier = Modifier.fillMaxSize()
-                    .padding(1.dp)
-            )
+        )
+    }
+}
+
+data class PagerItem(
+    val imageResId: Int
+)
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun discount(
+    modifier: Modifier = Modifier
+) {
+    val pagerItems = listOf(
+        PagerItem(R.drawable.a1),
+        PagerItem(R.drawable.a2),
+        PagerItem(R.drawable.a3)
+    )
+
+    val pagerState = rememberPagerState(
+        pageCount = { pagerItems.size }
+    )
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(3000)
+            val nextPage = (pagerState.currentPage + 1) % pagerState.pageCount
+            pagerState.animateScrollToPage(nextPage)
         }
+    }
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        HorizontalPagerSection(pagerItems, pagerState)
+        PageIndicator(
+            pageCount = pagerItems.size,
+            currentPage = pagerState.currentPage,
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.CenterHorizontally)
+        )
     }
 }

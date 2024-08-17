@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.filled.Star
 import com.example.barbershopapp.R
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.House
 import androidx.compose.material.icons.filled.Logout
@@ -61,6 +62,7 @@ import com.example.barbershopapp.data.firebase.AuthViewModel
 import com.example.barbershopapp.data.firebase.AuthViewModelFactory
 import com.example.barbershopapp.data.firebase.CityRepo
 import com.example.barbershopapp.data.firebase.StylistRepo
+import com.example.barbershopapp.data.home.BottomNavItem
 import com.example.barbershopapp.data.user.UserViewModel
 import com.example.barbershopapp.navigation.BarBerShopAppRoute
 import com.example.barbershopapp.navigation.Screen
@@ -96,20 +98,19 @@ fun ServiceColumn(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ServiceFlow(){
+fun ServiceFlow() {
     FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(5.dp)
-            .padding(top = 20.dp)
+            .padding(5.dp),
+        horizontalArrangement = Arrangement.Center
     ) {
         ServiceColumn(imageResource = R.drawable.cattoc, contentDescription = "Cắt tóc", serviceName = "Cắt tóc")
         ServiceColumn(imageResource = R.drawable.uontoc, contentDescription = "Uốn tóc", serviceName = "Uốn tóc")
         ServiceColumn(imageResource = R.drawable.duoitoc, contentDescription = "Duỗi tóc", serviceName = "Duỗi tóc")
-        ServiceColumn(imageResource = R.drawable.goidau, contentDescription = "Gọi đầu", serviceName = "Gọi đầu")
+        ServiceColumn(imageResource = R.drawable.goidau, contentDescription = "Gội đầu", serviceName = "Gội đầu")
     }
 }
-
 @Composable
 fun BodyContent() {
     Column(
@@ -124,13 +125,7 @@ fun BodyContent() {
         HeadingTextComponent(value = stringResource(id = R.string.coupon))
         discount()
         Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "DỊCH VỤ TÓC",
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            color = Color.Blue
-        )
+        HeadingTextComponent(value = stringResource(id = R.string.service))
         ServiceFlow()
     }
 }
@@ -141,13 +136,12 @@ fun UserHomeScreen() {
     val cityRepo = CityRepo()
     val stylistRepo = StylistRepo()
     val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(authRepo,cityRepo, stylistRepo)
+        factory = AuthViewModelFactory(authRepo, cityRepo, stylistRepo)
     )
 
     val user by authViewModel.user.collectAsState()
 
     val username = user?.name ?: "GUEST"
-
 
     Scaffold(
         bottomBar = {
@@ -156,10 +150,15 @@ fun UserHomeScreen() {
         topBar = {
             CustomTopBar(username = username)
         }
-    ) {
-            innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            BodyContent()
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxWidth()
+        ) {
+            item {
+                BodyContent()
+            }
         }
     }
 }
