@@ -48,4 +48,14 @@
     <string name="booking">Đặt lịch giữ chỗ</string>
     <string name="city">Chọn thành phố</string>
     <string name="stylist">Chọn stylist</string>
+    <string name="select_hour">Chọn giờ</string>
+    <string name="date_booking">Ngày cắt</string>
+    <string name="rating">rating</string>
+    <string name="coupon">coupon</string>
+    <string name="voucher_code">Mã giảm giá</string>
+    <string name="input_voucher_header">Nhập mã voucher(nếu có)</string>
+    <string name="select_city_header">Chọn thành phố</string>
+    <string name="select_stylist_header">Chọn thợ cắt tóc</string>
+    <string name="select_date_header">Chọn ngày</string>
+    <string name="select_hour_header">Chọn giờ</string>
 </resources>

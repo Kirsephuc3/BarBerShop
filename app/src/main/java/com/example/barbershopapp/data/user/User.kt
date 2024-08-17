@@ -1,10 +1,12 @@
 package com.example.barbershopapp.data.user
 
-import java.util.Date
+import com.google.firebase.firestore.PropertyName
 
 data class User(
-    val name: String? = null,
-    val email: String? = null,
-    val phone: Int? = null,
-    val birthday: String? = null
+    @PropertyName("name") val name: String? = null,
+    @PropertyName("phone") val phone: Int? = null,
+    @PropertyName("email") val email: String? = null,
+    @PropertyName("birthday") val birthday: String? = null,
+    @PropertyName("password") val password: String? = null,
+    @PropertyName("privacyPolicyAccepted") val privacyPolicyAccepted: Boolean? = null
 )

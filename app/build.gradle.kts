@@ -69,8 +69,10 @@ dependencies {
 
     implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
 
-
     implementation("com.google.firebase:firebase-appcheck-playintegrity")
+    implementation ("com.github.a914-gowtham:compose-ratingbar:1.3.12")
+    implementation ("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation ("com.google.accompanist:accompanist-pager-indicators:0.28.0")
 
 
     implementation(libs.androidx.core.ktx)

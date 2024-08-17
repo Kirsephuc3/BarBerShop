@@ -1,15 +1,25 @@
 package com.example.barbershopapp.components
 
 import android.util.Log
+import android.widget.RatingBar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +28,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -28,6 +40,8 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -37,6 +51,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +63,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -62,6 +78,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.barbershopapp.R
+import com.example.barbershopapp.data.home.BottomNavItem
+import com.example.barbershopapp.data.stylist.Stylist
+import com.example.barbershopapp.navigation.BarBerShopAppRoute
+import com.example.barbershopapp.navigation.Screen
 import com.example.barbershopapp.ui.theme.BgColor
 import com.example.barbershopapp.ui.theme.GrayColor
 import com.example.barbershopapp.ui.theme.Primary
@@ -70,6 +91,9 @@ import com.example.barbershopapp.ui.theme.Shape
 import com.example.barbershopapp.ui.theme.TextColor
 import com.example.barbershopapp.ui.theme.fontFamily1
 import com.example.barbershopapp.ui.theme.fontFamily2
+import com.gowtham.ratingbar.RatingBar
+import com.gowtham.ratingbar.RatingBarStyle
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -574,6 +598,18 @@ fun AppToolbar(
         )
     )
 }
+
+@Composable
+fun StylistItemComponent(stylist: Stylist) {
+    Card(modifier = Modifier.padding(8.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = "Tên: ${stylist.name}")
+            Text(text = "Email: ${stylist.email}")
+            Text(text = "Số điện thoại: ${stylist.phone}")
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DynamicSelectTextField(
@@ -581,10 +617,11 @@ fun DynamicSelectTextField(
     options: List<String>,
     label: String,
     onValueChangedEvent: (String) -> Unit,
+    defaultDisplayText: String = "Chọn thành phố",
     modifier: Modifier = Modifier
-) {
+    ) {
     var expanded by remember { mutableStateOf(false) }
-    var displayText by remember { mutableStateOf("Chọn thành phố") }
+    var displayText by remember { mutableStateOf(defaultDisplayText) }
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -616,6 +653,209 @@ fun DynamicSelectTextField(
                     }
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun SppokyAppBottomNavigation(
+) {
+    val items = listOf(
+        BottomNavItem.Home,
+        BottomNavItem.Stylist,
+        BottomNavItem.Booking,
+        BottomNavItem.History,
+        BottomNavItem.Profile
+    )
+
+    NavigationBar(
+        containerColor = Color.White,
+        contentColor = Color.Black,
+        tonalElevation = 8.dp
+    ) {
+        items.forEach { screenItem ->
+            NavigationBarItem(
+                icon = { Icon(screenItem.icon, contentDescription = screenItem.label) },
+                label = { Text(screenItem.label, fontSize = 12.sp, fontWeight = FontWeight.Bold) },
+                selected = BarBerShopAppRoute.currentScreen.value == screenItem.screen,
+                onClick = {
+                    BarBerShopAppRoute.currentScreen.value = screenItem.screen
+                }
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CustomTopBar(
+    username: String,
+    onAvatarClick: () -> Unit = {}
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { onAvatarClick.invoke() }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.img),
+                            contentDescription = "User Avatar",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = username,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp,
+                            color = Color.Black
+                        )
+                    }
+                }
+                IconButton(onClick = { /* Handle notification click */ }) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.img_1),
+                        contentDescription = "Notification"
+                    )
+                }
+            }
+        },
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            containerColor = GrayColor
+        ),
+        modifier = Modifier.background(Color(0xFF1F4591)),
+    )
+}
+
+@Composable
+fun AutoUpdatingRatingBar() {
+    var rating by remember { mutableStateOf(5f) }
+    var increasing by remember { mutableStateOf(false) } // Determines whether rating is increasing or decreasing
+
+    // Coroutine to update the rating automatically
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(50) // Adjust delay for smoothness
+            rating = if (increasing) {
+                if (rating < 5f) {
+                    rating + 0.1f // Increment rating
+                } else {
+                    // Change direction
+                    increasing = false
+                    rating - 0.1f
+                }
+            } else {
+                if (rating > 1f) {
+                    rating - 0.1f // Decrement rating
+                } else {
+                    // Change direction
+                    increasing = true
+                    rating + 0.1f
+                }
+            }
+        }
+    }
+
+    RatingBar(
+        value = rating,
+        onValueChange = { newRating ->
+            rating = newRating
+        },
+        onRatingChanged = { newRating ->
+            // Handle rating change here if needed
+        },
+        style = RatingBarStyle.Fill()
+    )
+}
+
+@Composable
+fun ratingbody() {
+    val colorStops = arrayOf(
+        0.1f to Color(0xFF7AEFF7),
+        0.4f to Color.White,
+        0.7f to Color(0xFFF4D0FA),
+        1f to Color(0xFF7AEFF7)
+    )
+    Box(
+        modifier = Modifier
+            .height(140.dp)
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(Brush.horizontalGradient(colorStops = colorStops))
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { BarBerShopAppRoute.navigateTo(Screen.HistoryScreen) }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 8.dp)
+                .align(Alignment.TopStart),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.anhnu),
+                contentDescription = "Custom Image",
+                modifier = Modifier
+                    .size(67.dp)
+                    .padding(1.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                Text(
+                    text = "MỜI BẠN ĐÁNH GIÁ CHẤT LƯỢNG PHỤC VỤ",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    fontFamily = fontFamily1,
+                )
+                Text(
+                    text = "Phản hồi của bạn giúp chúng tôi cải thiện dịch vụ",
+                    fontSize = 14.sp,
+                    fontFamily = fontFamily2
+                )
+                AutoUpdatingRatingBar()
+            }
+        }
+    }
+}
+
+@Composable
+fun discount() {
+    Box(
+        modifier = Modifier
+            .height(140.dp)
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(Color.White)
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { BarBerShopAppRoute.navigateTo(Screen.HistoryScreen) }
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(end = 8.dp)
+                .align(Alignment.TopStart),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.voucher2),
+                contentDescription = "Custom Image",
+                modifier = Modifier.fillMaxSize()
+                    .padding(1.dp)
+            )
         }
     }
 }
